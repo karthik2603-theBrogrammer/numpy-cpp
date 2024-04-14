@@ -3,19 +3,22 @@
 
 using namespace std;
 
-
 int main()
 {
   // Declare and initialize the array in one line
-  NdArray<double> arr({2, 3}, 1, 2, 3, 4, 5);
+  NdArray<double> arr({2, 3}, 1.5, 2, 3, 4, 5, 6);
   arr.show();
-  NdArray<double> arr2({2, 3}, 1, 2, 3, 4, 5, 5);
-  NdArray<double> md({3, 3, 3}, 1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 2, 3, 4, 5, 6, 7, 8, 9);
-  cout << md.dot(md) << endl;
+  NdArray<float> arr2({2, 3}, 1, 2, 3, 4, 5, 9);
+  arr2.show();
+  auto result = NdArrayOp::add(arr, arr2);
+  result.show();
+ 
+  // NdArray<double> md({3, 3, 3}, 1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 2, 3, 4, 5, 6, 7, 8, 9);
+  // cout << md.dot(md) << endl;
 
-  NdArray<int> z({2,3});
-  z = z.z();
-  z.show();
+  // NdArray<int> z({2,3});
+  // z = z.z();
+  // z.show();
 
   // NdArray<int> arr({10, 10});
   // NdArray<int> arr2({10, 10});
@@ -28,9 +31,7 @@ int main()
   //     arr2({i, j}) = rand() % 10;
   //   }
   // }
-  NdArray<double> arr3 = md / md;
-
-
+  // NdArray<double> arr3 = md / md;
 
   return 0;
 }

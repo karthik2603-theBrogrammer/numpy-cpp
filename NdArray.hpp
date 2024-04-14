@@ -2,6 +2,7 @@
 #include <vector>
 #include <thread>
 #include <chrono>
+#include <cmath>
 
 /*
 ----------------------------------------------------------------------------------------
@@ -22,10 +23,10 @@ By Karthik Namboori and Keerthan Gopalkrishnan.
 Requirements:
 1. Equal and active participation from the team members (done)
 2. Variadic templates                                   (done)
-3. Template specialization
+3. Template specialization                              (done)
 4. Lambda templates
 5. Fold expression                                      (done)
-6. Use of relevant type traits
+6. Use of relevant type traits                          (done)
 7. Template friendship
 8. Use of relevant concepts and constraints
 9. Minimum (or no) use of STL                            (done)
@@ -34,23 +35,184 @@ Requirements:
 */
 
 using namespace std;
+
+std::ostream &operator<<(std::ostream &os, const std::vector<int> &vec)
+{
+    os << "[ ";
+    for (const auto &elem : vec)
+    {
+        os << elem << " ";
+    }
+    os << "]";
+    return os;
+}
+
+// Generic template for NdArray
+template <typename T, typename Enable = void>
+class NdArray;
+
+namespace NdArrayOp
+{
+    template <typename T, typename U>
+    using Superclass = std::conditional_t<(sizeof(T) < sizeof(U)), U, T>;
+
+    // Define the operator+ function template
+    template <typename T, typename U>
+    NdArray<Superclass<T, U>> add(const NdArray<T> &lhs, const NdArray<U> &rhs)
+    {
+        using SuperType = typename NdArrayOp::Superclass<T, U>;
+        // Access the private data member of NdArray<T> because NdArrayOp::operator+ is a friend
+        // Here you can safely access the private member data
+        if (lhs.shape != rhs.shape)
+        {
+            std::cerr << "Error: Arrays have different shapes\n";
+            return NdArray<SuperType>(lhs.shape); // Return empty array
+        }
+
+        NdArray<SuperType> result(lhs.shape);
+        cout << typeid(result).name() << endl;
+
+        auto start = std::chrono::steady_clock::now();
+        bool use_parallel = false;
+        if (use_parallel)
+        {
+            std::vector<std::thread> threads;
+            threads.reserve(lhs.data.size());
+            for (int i = 0; i < lhs.data.size(); ++i)
+            {
+                threads.emplace_back([&result, &lhs, &rhs, i]()
+                                     { result.data[i] = static_cast<SuperType>(lhs.data[i]) +
+                                                        static_cast<SuperType>(rhs.data[i]); });
+            }
+            for (auto &thread : threads)
+            {
+                thread.join();
+            }
+        }
+        else
+        {
+            for (int i = 0; i < lhs.data.size(); ++i)
+            {
+                result.data[i] = lhs.data[i] + rhs.data[i];
+            }
+        }
+
+        auto end = std::chrono::steady_clock::now();
+        auto diff = end - start;
+
+        // Convert duration to milliseconds and output
+        std::cout << "Time taken: " << std::chrono::duration<double, std::milli>(diff).count() << " ms" << std::endl;
+
+        return result;
+    }
+    template <typename T, typename U>
+    NdArray<Superclass<T, U>> sub(const NdArray<T> &lhs, const NdArray<U> &rhs)
+    {
+        using SuperType = typename NdArrayOp::Superclass<T, U>;
+        if (lhs.shape != rhs.shape)
+        {
+            cerr << "Error: Arrays have different shapes, Aborting ...\n";
+            return NdArray<SuperType>(lhs.shape);
+        }
+        NdArray<SuperType> result(lhs.shape);
+        for (int i = 0; i < lhs.data.size(); ++i)
+        {
+            result.data[i] = static_cast<SuperType>(lhs.data[i]) - static_cast<SuperType>(rhs.data[i]);
+            ;
+        }
+        return result;
+    }
+
+    template <typename T, typename U>
+    NdArray<Superclass<T, U>> mul(const NdArray<T> &lhs, const NdArray<U> &rhs)
+    {
+        using SuperType = typename NdArrayOp::Superclass<T, U>;
+        if (lhs.shape != rhs.shape)
+        {
+            cerr << "Error: Arrays have different shapes, Aborting ...\n";
+            return NdArray<SuperType>(lhs.shape);
+        }
+        NdArray<SuperType> result(lhs.shape);
+        for (int i = 0; i < lhs.data.size(); ++i)
+        {
+            result.data[i] = static_cast<SuperType>(lhs.data[i]) * static_cast<SuperType>(rhs.data[i]);
+            ;
+        }
+        return result;
+    }
+
+    template <typename T, typename U>
+    NdArray<Superclass<T, U>> div(const NdArray<T> &lhs, const NdArray<U> &rhs)
+    {
+        using SuperType = typename NdArrayOp::Superclass<T, U>;
+        if (lhs.shape != rhs.shape)
+        {
+            cerr << "Error: Arrays have different shapes, Aborting ...\n";
+            return NdArray<SuperType>(lhs.shape);
+        }
+        NdArray<SuperType> result(lhs.shape);
+        for (int i = 0; i < lhs.data.size(); ++i)
+        {
+            result.data[i] = static_cast<SuperType>(lhs.data[i]) / static_cast<SuperType>(rhs.data[i]);
+            ;
+        }
+        return result;
+    }
+
+    template <typename T, typename U>
+    NdArray<Superclass<T, U>> pow(const NdArray<T> &lhs, const NdArray<U> &rhs)
+    {
+        using SuperType = typename NdArrayOp::Superclass<T, U>;
+        if (lhs.shape != rhs.shape)
+        {
+            cerr << "Error: Arrays have different shapes, Aborting ...\n";
+            return NdArray<SuperType>(lhs.shape);
+        }
+        NdArray<SuperType> result(lhs.shape);
+        for (int i = 0; i < lhs.data.size(); ++i)
+        {
+            result.data[i] = std::pow(static_cast<SuperType>(lhs.data[i]), static_cast<SuperType>(rhs.data[i]));
+        }
+        return result;
+    }
+
+    template <typename T, typename U>
+    Superclass<T, U> dot(const NdArray<T> &lhs, const NdArray<U> &rhs)
+    {
+        using SuperType = typename NdArrayOp::Superclass<T, U>;
+        if (lhs.shape != rhs.shape)
+        {
+            std::cerr << "Error: Arrays have different shapes\n";
+            return SuperType(); // Return default value for type T
+        }
+
+        SuperType result = 0;
+        for (int i = 0; i < lhs.data.size(); ++i)
+        {
+            result += static_cast<SuperType>(lhs.data[i]) * static_cast<SuperType>(rhs.data[i]);
+        }
+        return result;
+    }
+}
+
 template <typename T>
-class NdArray
+class NdArray<T, typename std::enable_if<std::is_arithmetic<T>::value>::type>
 {
 private:
     // Shape of the array
     std::vector<int> strides; // Strides for efficient element access
     std::vector<T> data;      // Data storage
-                              // unordered_map<string, string> colorMap;
-                              // colorMap["default"] = "\033[0m";
-                              //   colorMap["black"] = "\033[30m";
-                              //   colorMap["red"] = "\033[31m";
-                              //   colorMap["green"] = "\033[32m";
-                              //   colorMap["yellow"] = "\033[33m";
-                              //   colorMap["blue"] = "\033[34m";
-                              //   colorMap["magenta"] = "\033[35m";
-                              //   colorMap["cyan"] = "\033[36m";
-                              //   colorMap["white"] = "\033[37m";
+    // unordered_map<string, string> colorMap;
+    // colorMap["default"] = "\033[0m";
+    //   colorMap["black"] = "\033[30m";
+    //   colorMap["red"] = "\033[31m";
+    //   colorMap["green"] = "\033[32m";
+    //   colorMap["yellow"] = "\033[33m";
+    //   colorMap["blue"] = "\033[34m";
+    //   colorMap["magenta"] = "\033[35m";
+    //   colorMap["cyan"] = "\033[36m";
+    //   colorMap["white"] = "\033[37m";
+    
 
 public:
     void showDim() const
@@ -134,66 +296,6 @@ public:
     // Function to access elements using multidimensional indices
     T &operator()(std::vector<int> indices) { return data[getIndex(indices)]; }
 
-    // Overload the + operator for addition
-    NdArray<T> operator+(const NdArray<T> &other) const
-    {
-        if (shape != other.shape)
-        {
-            std::cerr << "Error: Arrays have different shapes\n";
-            return NdArray<T>(shape); // Return empty array
-        }
-
-        NdArray<T> result(shape);
-        // for (int i = 0; i < data.size(); ++i) {
-        //   result.data[i] = data[i] + other.data[i];
-        // }
-        // return result;
-        auto start = std::chrono::steady_clock::now();
-        bool use_parallel = false;
-        if (use_parallel)
-        {
-            std::vector<std::thread> threads;
-            threads.reserve(data.size());
-            for (int i = 0; i < data.size(); ++i)
-            {
-                threads.emplace_back([&result, this, &other, i]()
-                                     { result.data[i] = this->data[i] + other.data[i]; });
-            }
-            for (auto &thread : threads)
-            {
-                thread.join();
-            }
-        }
-        else
-        {
-            for (int i = 0; i < data.size(); ++i)
-            {
-                result.data[i] = data[i] + other.data[i];
-            }
-        }
-        auto end = std::chrono::steady_clock::now();
-        auto diff = end - start;
-
-        // Convert duration to milliseconds and output
-        std::cout << "Time taken: " << std::chrono::duration<double, std::milli>(diff).count() << " ms" << std::endl;
-
-        return result;
-    }
-    T dot(const NdArray<T> &other) const
-    {
-        if (shape != other.shape)
-        {
-            std::cerr << "Error: Arrays have different shapes\n";
-            return T(); // Return default value for type T
-        }
-
-        T result = 0;
-        for (int i = 0; i < data.size(); ++i)
-        {
-            result += data[i] * other.data[i];
-        }
-        return result;
-    }
     NdArray<T> z()
     {
         int numZeroes = 1;
@@ -206,72 +308,6 @@ public:
         }
 
         return res;
-    }
-    NdArray<T> operator-(const NdArray<T> &other) const
-    {
-        cout << shape << " And the other vectors shape: " << other.shape << endl;
-        if (shape != other.shape)
-        {
-            cerr << "Error: Arrays have different shapes, Aborting ...\n";
-            return NdArray<T>(shape);
-        }
-
-        NdArray<T> result(shape);
-        for (int i = 0; i < data.size(); ++i)
-        {
-            result.data[i] = data[i] - other.data[i];
-        }
-        return result;
-    }
-    NdArray<T> operator*(const NdArray<T> &other) const
-    {
-        if (shape != other.shape)
-        {
-            std::cerr << "Error: Arrays have different shapes\n";
-            return NdArray<T>(shape); // Return empty array
-        }
-
-        NdArray<T> result(shape);
-        for (int i = 0; i < data.size(); ++i)
-        {
-            result.data[i] = data[i] * other.data[i];
-        }
-        return result;
-    }
-    NdArray<T> operator/(const NdArray<T> &other) const
-    {
-        if (shape != other.shape)
-        {
-            std::cerr << "Error: Arrays have different shapes\n";
-            return NdArray<T>(shape); // Return empty array
-        }
-
-        NdArray<T> result(shape);
-        for (int i = 0; i < data.size(); ++i)
-        {
-            if (other.data[i] == 0)
-            {
-                std::cerr << "Error: Division by zero encountered\n";
-                return NdArray<T>(shape); // Return empty array
-            }
-            result.data[i] = data[i] / other.data[i];
-        }
-        return result;
-    }
-    NdArray<T> pow(const NdArray<T> &other) const
-    {
-        if (shape != other.shape)
-        {
-            std::cerr << "Error: Arrays have different shapes\n";
-            return NdArray<T>(shape); // Return empty array
-        }
-
-        NdArray<T> result(shape);
-        for (int i = 0; i < data.size(); ++i)
-        {
-            result.data[i] = std::pow(data[i], other.data[i]);
-        }
-        return result;
     }
     NdArray<T> exp() const
     {
