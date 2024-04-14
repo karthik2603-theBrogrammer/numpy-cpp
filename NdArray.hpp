@@ -24,12 +24,12 @@ Requirements:
 1. Equal and active participation from the team members (done)
 2. Variadic templates                                   (done)
 3. Template specialization                              (done)
-4. Lambda templates
+4. Lambda templates                                     
 5. Fold expression                                      (done)
 6. Use of relevant type traits                          (done)
-7. Template friendship
-8. Use of relevant concepts and constraints
-9. Minimum (or no) use of STL                            (done)
+7. Template friendship                                  (done)
+8. Use of relevant concepts and constraints             (done)
+9. Minimum (or no) use of STL                           (done)
 10. Well commented code                                 (done)
 ----------------------------------------------------------------------------------------
 */
@@ -70,7 +70,6 @@ namespace NdArrayOp
         }
 
         NdArray<SuperType> result(lhs.shape);
-        cout << typeid(result).name() << endl;
 
         auto start = std::chrono::steady_clock::now();
         bool use_parallel = false;
@@ -202,6 +201,25 @@ private:
     // Shape of the array
     std::vector<int> strides; // Strides for efficient element access
     std::vector<T> data;      // Data storage
+
+    template <typename U, typename V>
+    friend NdArray<NdArrayOp::Superclass<U, V>> NdArrayOp::add(const NdArray<U> &lhs, const NdArray<V> &rhs);
+
+    template <typename U, typename V>
+    friend NdArray<NdArrayOp::Superclass<U, V>> NdArrayOp::sub(const NdArray<U> &lhs, const NdArray<V> &rhs);
+
+    template <typename U, typename V>
+    friend NdArray<NdArrayOp::Superclass<U, V>> NdArrayOp::mul(const NdArray<U> &lhs, const NdArray<V> &rhs);
+
+    template <typename U, typename V>
+    friend NdArray<NdArrayOp::Superclass<U, V>> NdArrayOp::div(const NdArray<U> &lhs, const NdArray<V> &rhs);
+
+    template <typename U, typename V>
+    friend NdArray<NdArrayOp::Superclass<U, V>> NdArrayOp::pow(const NdArray<U> &lhs, const NdArray<V> &rhs);
+
+    template <typename U, typename V>
+    friend NdArrayOp::Superclass<U, V> NdArrayOp::dot(const NdArray<U> &lhs, const NdArray<V> &rhs);
+
     // unordered_map<string, string> colorMap;
     // colorMap["default"] = "\033[0m";
     //   colorMap["black"] = "\033[30m";
@@ -212,7 +230,6 @@ private:
     //   colorMap["magenta"] = "\033[35m";
     //   colorMap["cyan"] = "\033[36m";
     //   colorMap["white"] = "\033[37m";
-    
 
 public:
     void showDim() const
