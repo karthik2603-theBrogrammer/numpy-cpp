@@ -21,6 +21,16 @@ int main()
   result = NdArrayOp::pow(arr, arr2);
   result.show();
   cout << NdArrayOp::dot(arr, arr2) << endl;
+
+  NdArray<double> ar({3, 3});
+
+    // Call the z() function to initialize the array with zeros
+  NdArray<double> zeroArray = ar.z();
+
+    // Display the array
+    zeroArray.show();
+
+
  
   // NdArray<double> md({3, 3, 3}, 1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 2, 3, 4, 5, 6, 7, 8, 9);
   // cout << md.dot(md) << endl;

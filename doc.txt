@@ -1,0 +1,54 @@
+INFO: In case the shell script says 
+`zsh: permission denied: ./start-all.sh`
+
+Execute:
+❯ chmod +x start-all.sh
+
+Then:
+❯ ./start-all.sh
+
+
+
+NdArray<double> arr({2, 3}, 1.5, 2, 3, 4, 5, 6);
+arr.show();
+
+NdArray<double> arr2({2, 3}, 1, 2, 3, 4, 5, 9);
+arr2.show();
+
+// Performing addition operation on NdArray objects
+auto result = NdArrayOp::add(arr, arr2);
+std::cout << "Result of addition:" << std::endl;
+result.show();
+
+// Performing subtraction operation on NdArray objects
+result = NdArrayOp::sub(arr, arr2);
+std::cout << "Result of subtraction:" << std::endl;
+result.show();
+
+// Performing multiplication operation on NdArray objects
+result = NdArrayOp::mul(arr, arr2);
+std::cout << "Result of multiplication:" << std::endl;
+result.show();
+
+// Performing division operation on NdArray objects
+result = NdArrayOp::div(arr, arr2);
+std::cout << "Result of division:" << std::endl;
+result.show();
+
+// Performing exponentiation operation on NdArray objects
+result = NdArrayOp::pow(arr, arr2);
+std::cout << "Result of exponentiation:" << std::endl;
+result.show();
+
+// Performing dot product operation on NdArray objects
+std::cout << "Dot product of arr and arr2:" << std::endl;
+std::cout << NdArrayOp::dot(arr, arr2) << std::endl;
+
+// Creating an NdArray initialized with zeros
+NdArray<double> ar({3, 3});
+// Call the z() function to initialize the array with zeros
+NdArray<double> zeroArray = ar.z();
+
+// Display the array
+std::cout << "Zero array:" << std::endl;
+zeroArray.show();

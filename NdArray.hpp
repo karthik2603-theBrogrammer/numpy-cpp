@@ -6,13 +6,15 @@
 
 /*
 ----------------------------------------------------------------------------------------
- _   _ _   _ __  __ ______   __     ____ ____  ____
-| \ | | | | |  \/  |  _ \ \ / /    / ___|  _ \|  _ \
-|  \| | | | | |\/| | |_) \ V /____| |   | |_) | |_) |
-| |\  | |_| | |  | |  __/ | |_____| |___|  __/|  __/
-|_| \_|\___/|_|  |_|_|    |_|      \____|_|   |_|
 
-An end to end, shell and API set for Linear Algebra using generic programming concepts
+ _ __  _   _ _ __ ___  _ __  _   _        ___ _ __  _ __
+| '_ \| | | | '_ ` _ \| '_ \| | | |_____ / __| '_ \| '_ \
+| | | | |_| | | | | | | |_) | |_| |_____| (__| |_) | |_) |
+|_| |_|\__,_|_| |_| |_| .__/ \__, |      \___| .__/| .__/
+                      |_|    |___/           |_|   |_|
+
+
+An end to end library for Linear Algebra using generic programming concepts
 such as Templates, Variadic Templates, Fold Expressions and many more.
 
 License: Apache 2.0.
@@ -24,7 +26,7 @@ Requirements:
 1. Equal and active participation from the team members (done)
 2. Variadic templates                                   (done)
 3. Template specialization                              (done)
-4. Lambda templates                                     
+4. Lambda templates                                     (done)
 5. Fold expression                                      (done)
 6. Use of relevant type traits                          (done)
 7. Template friendship                                  (done)
@@ -35,6 +37,11 @@ Requirements:
 */
 
 using namespace std;
+
+#define BLUE "\033[34m"
+#define GREEN "\033[32m"
+#define RED "\033[31m"
+#define RESET "\033[0m"
 
 std::ostream &operator<<(std::ostream &os, const std::vector<int> &vec)
 {
@@ -146,7 +153,8 @@ namespace NdArrayOp
         using SuperType = typename NdArrayOp::Superclass<T, U>;
         if (lhs.shape != rhs.shape)
         {
-            cerr << "Error: Arrays have different shapes, Aborting ...\n";
+            cerr << RED << "Error: Arrays have different shapes, Aborting ...\n";
+            exit(1);
             return NdArray<SuperType>(lhs.shape);
         }
         NdArray<SuperType> result(lhs.shape);
@@ -220,28 +228,18 @@ private:
     template <typename U, typename V>
     friend NdArrayOp::Superclass<U, V> NdArrayOp::dot(const NdArray<U> &lhs, const NdArray<V> &rhs);
 
-    // unordered_map<string, string> colorMap;
-    // colorMap["default"] = "\033[0m";
-    //   colorMap["black"] = "\033[30m";
-    //   colorMap["red"] = "\033[31m";
-    //   colorMap["green"] = "\033[32m";
-    //   colorMap["yellow"] = "\033[33m";
-    //   colorMap["blue"] = "\033[34m";
-    //   colorMap["magenta"] = "\033[35m";
-    //   colorMap["cyan"] = "\033[36m";
-    //   colorMap["white"] = "\033[37m";
-
 public:
     void showDim() const
     {
-        cout << "\033[36m"
-             << "\nShape{";
-        for (auto d : shape)
-        {
-            cout << d << ",";
-        }
-        cout << "}" << endl;
-        cout << "\033[32mEnd." << endl;
+        // cout << "\033[36m"
+        //      << "\nShape{";
+        // for (auto d : shape)
+        // {
+        //     cout << d << ",";
+        // }
+        // cout << "}" << endl;
+        cout << endl;
+        cout << "--------\033[32m    End.    \033[36m-------- \n\n" << endl;
     }
     void show() const
     {
@@ -274,6 +272,7 @@ public:
         {
             std::cerr << "\033[31mError: Number of elements provided does not match the size "
                          "of the array\n";
+            std::cerr << "\033[31mTerminated.\n";
             exit(1);
         }
         int i = 0;
@@ -313,19 +312,25 @@ public:
     // Function to access elements using multidimensional indices
     T &operator()(std::vector<int> indices) { return data[getIndex(indices)]; }
 
-    NdArray<T> z()
+    NdArray<T> z() const
     {
         int numZeroes = 1;
-        for (auto e : shape)
-            numZeroes *= e;
-        NdArray<T> res(shape);
-        for (int i = 0; i < numZeroes; i++)
+        for (auto dim : shape)
+            numZeroes *= dim;
+
+        NdArray<T> result(shape);
+
+        // Use lambda template to initialize elements with zeros
+        auto initZero = [&result](int index)
+        { result.data[index] = static_cast<T>(0); };
+        for (int i = 0; i < numZeroes; ++i)
         {
-            res.data.push_back(static_cast<T>(0));
+            initZero(i);
         }
 
-        return res;
+        return result;
     }
+
     NdArray<T> exp() const
     {
         NdArray<T> result(shape);
@@ -333,6 +338,7 @@ public:
         {
             result.data[i] = std::exp(data[i]);
         }
+        
         return result;
     }
     NdArray<T> sqrt() const
