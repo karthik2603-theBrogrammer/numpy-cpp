@@ -5,22 +5,12 @@ using namespace std;
 
 int main()
 {
-  // Declare and initialize the array in one line
-  NdArray<double> arr({2, 3}, 1.5, 2, 3, 4, 5, 6);
-  arr.show();
-  NdArray<double> arr2({2, 3}, 1, 2, 3, 4, 5, 9);
-  arr2.show();
+  
+  NdArray<double> arr({2,2,2}, 1,2,3,4,5,6,7,8);
+  NdArray<double> arr2({2,2,2}, 9, 7.2, 9, 9, 9, 9,9, 9);
   auto result = NdArrayOp::add(arr, arr2);
   result.show();
-  result = NdArrayOp::sub(arr, arr2);
-  result.show();
-  result = NdArrayOp::mul(arr, arr2);
-  result.show();
-  result = NdArrayOp::div(arr, arr2);
-  result.show();
-  result = NdArrayOp::pow(arr, arr2);
-  result.show();
-  cout << NdArrayOp::dot(arr, arr2) << endl;
+  
 
   NdArray<double> ar({3, 3});
 

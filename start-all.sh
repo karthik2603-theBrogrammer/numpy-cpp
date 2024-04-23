@@ -14,7 +14,7 @@ cat << "EOF"
                       |_|    |___/           |_|   |_|
                                                                             
 An end to end library for Linear Algebra using generic programming concepts
-such as Templates, Variadic Templates, Fold Expressions and many more.
+such as Templates, Variadic Templates, Friendship and many more.
 
 License: Apache 2.0.
 
@@ -28,6 +28,7 @@ if [ $? -eq 0 ]; then
   echo -e "\033[32mCompilation successful! Execute './a.out' to run the sample c++ code, i.e index.cpp\033[0m"
   echo -e "\033[34m\nFor documentation, refer 'doc.txt'"
   echo -e "\033[34mRun 'cat doc.txt' for the same.\n"
+  # ./a.out
 
 #  ./a.out # In case you have compiled into another object file using the -o file, this command has to manually changed.
 #   echo -e "\033[32mExecution completed.\033[0m"

@@ -52,3 +52,50 @@ NdArray<double> zeroArray = ar.z();
 // Display the array
 std::cout << "Zero array:" << std::endl;
 zeroArray.show();
+
+
+Where Variadic Templates
+------------------------
+
+The template takes variable number of arguments, each element to fit in the numpy array as one.
+It handles insertion of the numpy array, and when reached base case, it terminates.
+
+// Helper function to initialize elements of the array
+template <typename Arg, typename... Args>
+void initializeElements(int &index, Arg value, Args... args)
+{
+    data[index++] = value;
+    initializeElements(index, args...); // Recursive call to handle remaining arguments
+}
+
+
+
+
+
+What Is strides and how is it beneficial ?
+-----------------------------------------
+
+Let's say you have a 3x4x5 array. The strides would be calculated as follows:
+Stride for the last dimension (5 elements): 1
+Stride for the second dimension (4 rows * 5 elements): 5
+Stride for the first dimension (3 rows * 4 columns * 5 elements): 20
+So, if you want to access the element at coordinates (2, 3, 1), you'd calculate the index as 2 * 20 + 3 * 5 + 1 * 1 = 71, and then use this index to access the element in the underlying one-dimensional array.
+
+
+Where Template Specialisation ?
+------------------------------
+
+In the code snippet you provided, template specialization is not explicitly used. However, 
+there is a form of partial specialization used with std::enable_if in the class template NdArray.
+
+Let's break down the line where it's used:
+template <typename T, typename Enable = void>
+class NdArray;
+
+
+Lambda Templates
+----------------
+
+
+Lambda templates allow lambda functions that use template parameters as the function
+parameters itself.

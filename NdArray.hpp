@@ -5,7 +5,7 @@
 #include <cmath>
 
 /*
-----------------------------------------------------------------------------------------
+
 
  _ __  _   _ _ __ ___  _ __  _   _        ___ _ __  _ __
 | '_ \| | | | '_ ` _ \| '_ \| | | |_____ / __| '_ \| '_ \
@@ -15,7 +15,7 @@
 
 
 An end to end library for Linear Algebra using generic programming concepts
-such as Templates, Variadic Templates, Fold Expressions and many more.
+such as Templates, Variadic Templates, Friendship and many more.
 
 License: Apache 2.0.
 
@@ -27,12 +27,11 @@ Requirements:
 2. Variadic templates                                   (done)
 3. Template specialization                              (done)
 4. Lambda templates                                     (done)
-5. Fold expression                                      (done)
-6. Use of relevant type traits                          (done)
-7. Template friendship                                  (done)
-8. Use of relevant concepts and constraints             (done)
-9. Minimum (or no) use of STL                           (done)
-10. Well commented code                                 (done)
+5. Use of relevant type traits                          (done)
+6. Template friendship                                  (done)
+7. Use of relevant concepts and constraints             (done)
+8. Minimum (or no) use of STL                           (done)
+9. Well commented code                                 (done)
 ----------------------------------------------------------------------------------------
 */
 
@@ -82,6 +81,7 @@ namespace NdArrayOp
         bool use_parallel = false;
         if (use_parallel)
         {
+            printf("Using Parallel\n");
             std::vector<std::thread> threads;
             threads.reserve(lhs.data.size());
             for (int i = 0; i < lhs.data.size(); ++i)
@@ -106,7 +106,6 @@ namespace NdArrayOp
         auto end = std::chrono::steady_clock::now();
         auto diff = end - start;
 
-        // Convert duration to milliseconds and output
         std::cout << "Time taken: " << std::chrono::duration<double, std::milli>(diff).count() << " ms" << std::endl;
 
         return result;
@@ -204,11 +203,11 @@ namespace NdArrayOp
 
 template <typename T>
 class NdArray<T, typename std::enable_if<std::is_arithmetic<T>::value>::type>
+// SFINAE (Substitution Failure Is Not An Error)
 {
 private:
     // Shape of the array
     std::vector<int> strides; // Strides for efficient element access
-    std::vector<T> data;      // Data storage
 
     template <typename U, typename V>
     friend NdArray<NdArrayOp::Superclass<U, V>> NdArrayOp::add(const NdArray<U> &lhs, const NdArray<V> &rhs);
@@ -239,7 +238,8 @@ public:
         // }
         // cout << "}" << endl;
         cout << endl;
-        cout << "--------\033[32m    End.    \033[36m-------- \n\n" << endl;
+        cout << "--------\033[32m    End.    \033[36m-------- \n\n"
+             << endl;
     }
     void show() const
     {
@@ -252,6 +252,7 @@ public:
     }
 
     std::vector<int> shape;
+    std::vector<T> data; 
     // Constructor to initialize the array with a given shape
     NdArray(std::vector<int> shape) : shape(shape)
     {
@@ -320,7 +321,7 @@ public:
 
         NdArray<T> result(shape);
 
-        // Use lambda template to initialize elements with zeros
+
         auto initZero = [&result](int index)
         { result.data[index] = static_cast<T>(0); };
         for (int i = 0; i < numZeroes; ++i)
@@ -338,7 +339,7 @@ public:
         {
             result.data[i] = std::exp(data[i]);
         }
-        
+
         return result;
     }
     NdArray<T> sqrt() const
