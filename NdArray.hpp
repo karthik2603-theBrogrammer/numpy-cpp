@@ -321,7 +321,7 @@ public:
 
         NdArray<T> result(shape);
 
-
+        // lambda function and templates.
         auto initZero = [&result](int index)
         { result.data[index] = static_cast<T>(0); };
         for (int i = 0; i < numZeroes; ++i)
